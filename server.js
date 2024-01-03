@@ -1,28 +1,32 @@
+
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors'); // Include CORS
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server); // Setup socket.io
 
 const PORT = process.env.PORT || 3000;
 
 // Enable CORS for all routes
-app.use(cors()); // Use CORS
+app.use(cors());
 
 // Middleware for parsing JSON bodies
 app.use(express.json());
+
+// Store the latest webhook data
+let latestData = null;
+
 // Webhook endpoint for Strapi
 app.post('/webhook', (req, res) => {
     console.log('Webhook received:', req.body);
-    
-    // Emit the data to all connected socket clients
-    io.emit('postCreated', req.body);
-
-    // Respond to the webhook
+    latestData = req.body; // Store the latest data
     res.status(200).send('Webhook received');
+});
+
+// Endpoint for the frontend to poll
+app.get('/poll', (req, res) => {
+    res.json(latestData); // Send the latest data
 });
 
 app.get('/', (req, res) => {
