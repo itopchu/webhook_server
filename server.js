@@ -1,5 +1,5 @@
-
-const express = require('express');
+// const express = require('express');
+import express from 'express';
 const http = require('http');
 const cors = require('cors');
 
@@ -10,6 +10,12 @@ const PORT = process.env.PORT || 3000;
 
 // Enable CORS for all routes
 app.use(cors());
+
+// Middleware for setting Content Security Policy headers
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "script-src 'self' https://cdn.rawgit.com https://cdn.jsdelivr.net");
+  next();
+});
 
 // Middleware for parsing JSON bodies
 app.use(express.json());
